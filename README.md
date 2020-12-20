@@ -38,11 +38,34 @@ $ python manage.py migrate
 </br>
 
 ## 1.4 서버 가동해보기
+***manage.py***를 사용하여 서버를 가동시켜본다. 
 ```bash
 $ python manage.py runserver 
 ```
-</br>
+> 실행하면 다음과 같은 실행문이 뜨는데 http://127.0.0,1:8000/ 부분이 현재 우리 서버의 주소다
+```
+PS C:\Users\An\Desktop\Django\OSS_python_django\OSS_project> python manage.py runserver 
+Watching for file changes with StatReloader
+Performing system checks...
 
+System check identified no issues (0 silenced).
+December 20, 2020 - 18:37:03
+Django version 3.1.4, using settings 'OSS_project.settings'
+Starting development server at http://127.0.0.1:8000/
+Quit the server with CTRL-BREAK.
+[20/Dec/2020 18:37:15] "GET / HTTP/1.1" 200 16351
+[20/Dec/2020 18:37:15] "GET /static/admin/css/fonts.css HTTP/1.1" 304 0
+[20/Dec/2020 18:37:16] "GET /static/admin/fonts/Roboto-Bold-webfont.woff HTTP/1.1" 304 0
+[20/Dec/2020 18:37:16] "GET /static/admin/fonts/Roboto-Regular-webfont.woff HTTP/1.1" 304 0
+[20/Dec/2020 18:37:16] "GET /static/admin/fonts/Roboto-Light-webfont.woff HTTP/1.1" 304 0
+Not Found: /favicon.ico
+[20/Dec/2020 18:37:16] "GET /favicon.ico HTTP/1.1" 404 1977
+```
+> 성공후 접속한 초기페이지이다.
+
+![1 초기웹페이지](https://user-images.githubusercontent.com/53415223/102709995-896be300-42f2-11eb-925f-e054d5a47917.png)
+
+</br>
 
 
 
