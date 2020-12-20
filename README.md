@@ -78,10 +78,16 @@ Not Found: /favicon.ico
 
 
 # 3. 기본 프레임워크를 응용하여 게시판 만들어보기
-## 3.1 가상환경 세팅
+## 3.1 어플리케이션 생성
+OSS_project/OSS_project 내의 파일들은 전체어플리케이션을 통제하는 장고 프레임워크의 기본 모듈이다.
+
+우리는 우리만의 ***비즈니스로직*** 을 정의하기 위해서 startapp 명령어로 어플 폴더를 따로 정의해주어야 한다. 
 ```bash
 $ python manage.py startapp main
 ```
+
+어플리케이션 생성후 우리의 어플리케이션을 프레임워크가 인지할 수 있도록 다음 코드를 작성하자
+
 ***OSS_project/OSS_project/settings.py*** 파일의 기존 INSTALLED_APPS 구절을 다음코드로 교체 
 
 ```
@@ -97,26 +103,125 @@ INSTALLED_APPS = [
 ]
 
 ```
-***OSS_project/OSS_project/main/templates/main*** 경로로 폴더를 생성해준다.
 
-templates 폴더를 생성후 그안에 main폴더를 생성!
+이제 프레임워크가 우리의 어플리케이션을 인지했다.
+
+따라서 어플리케이션 차원에서 URL 요청을 받고 MVT 패턴에 의해 페이지를 생성하게끔 작동방식을 변경해주어야 한다.
+
+이는 프레임워크의 urls.py와 어플리케이션의 urls.py를 연동하는것으로 가능하다.
+
+***OSS_project/urls.py*** 를 다음코드로 교체
+```python
+from django.contrib import admin
+from django.urls import path, include
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('', include('main.urls')),
+]
 ```
-OSS_project/
-    OSS_project/
-        main/
-            templates/            <= 생성1
-                main/             <= 생성2
+
+또한 어플리케이션이 URL에 대한 라우팅을 할 수 있도록 정의가 필요하다.
+
+우리는 다음과같이 페이지 URL을 정의하겠다.
+
+1) 게시글 목록 => 127.0.0.1:8000/blog
+2) 게시글 상세 => 127.0.0.1:8000/blog/숫자
+3) 게시글 생성 => 127.0.0.1:8000/new_post
+4) 게시글 삭제 => 127.0.0.1:8000/remove_post
+
+***OSS_project/OSS_project/main/urls.py*** 생성후 다음코드를 복사 붙여넣기
+```python
+from django.contrib import admin
+from django.urls import path
+# index는 대문, blog는 게시판
+from main.views import index, blog, posting, new_post, remove_post
+
+
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    # 웹사이트의 첫화면은 index 페이지이다 + URL이름은 index이다
+    path('', index, name='index'),
+    # URL:8000/blog에 접속하면 blog 페이지 + URL이름은 blog이다
+    path('blog/', blog, name='blog'),
+    # URL:8000/blog/숫자로 접속하면 게시글-세부페이지(posting)
+    path('blog/<int:pk>/', posting, name='posting'),
+    # 게시글작성페이지
+    path('blog/new_post/', new_post),
+    # 게시글 삭제 페이지
+    path('blog/<int:pk>/remove/', remove_post),
+]
 ```
+## 3.2 어플리케이션 Model 정의
+어플리케이션 생성을 마쳤으니 이제 MVT 패턴의 첫번째인 Model을 정의해주어야 한다.
+
+어플리케이션 폴더 내의 model.py 를 작성하는것으로 완료된다.
+
+***OSS_project/OSS_project/main/models.py*** 를 다음코드로 교체
+```python
+from django.db import models
+
+class Post(models.Model):
+    objects = models.Manager()
+    postname = models.CharField(max_length=50)
+    contents = models.TextField()
+
+    # postname이 Post object 대신 나오기
+    def __str__(self):
+        return self.postname
+```
+
+장고는 데이터의 생성과 수정, 삭제를 직접 정의해주지 않아도 가능하게끔 하는 admin 모듈이 있다.
+
+해당 페이지에서도 글의 수정과 삭제를 가능하게 권한을 허용해주는 절차는 다음 코드로 가능하다.
+
+***OSS_project/OSS_project/main/admin.py*** 를 다음코드로 교체
+```python
+from django.contrib import admin
+# 게시글(Post) Model을 불러옵니다
+from .models import Post
+
+# Register your models here.
+# 관리자(admin)가 게시글(Post)에 접근 가능
+admin.site.register(Post)
+```
+
+***superuser(관리자계정)*** 생성하기
+```
+$ python3 manage.py createsuperuser
+```
+
+```
+PS C:\Users\An\Desktop\Django\OSS_python_django> python manage.py createsuperuser
+C:\Users\An\anaconda3\python.exe: can't open file 'manage.py': [Errno 2] No such file or directory
+PS C:\Users\An\Desktop\Django\OSS_python_django> cd .\OSS_project\
+PS C:\Users\An\Desktop\Django\OSS_python_django\OSS_project> python manage.py createsuperuser
+Username (leave blank to use 'an'): ACH
+Email address: leaping96@ajou.ac.kr
+Password: 
+Password (again):
+This password is too short. It must contain at least 8 characters.
+This password is too common.
+This password is entirely numeric.
+Bypass password validation and create user anyway? [y/N]: y
+Superuser created successfully.
+```
+위와 같이 Username, Password, email 등을 입력하면 관리자계정의 생성과 데이터접근허용이 완료된다. 
+
+장고에서 지원하는 관리자페이지는 프레임워크 구성을 마친 후 예시 이미지로 다시 설명하겠다.
+
+## 3.3 어플리케이션 View 정의 
+
+Model을 정의해 주었으니 이제 MVT패턴에서 가장 중추역할을 하는 view.py 코드를 작성하자
+
+view.py 는 urls.py에게 http 요청을 받고 model.py와 template를 사용하여 적절한 페이지를 반환한다.
 
 ***OSS_project/OSS_project/main/views.py*** 에 다음코드를 복사
 ```python
 from django.shortcuts import *
 # View에 Model(Post 게시글) 가져오기
 from .models import Post
-
-# index.html 페이지를 부르는 index 함수
-def index(request):
-    return render(request, 'main/index.html')
 
 # blog.html 페이지를 부르는 blog 함수
 def blog(request):
@@ -149,91 +254,36 @@ def remove_post(request, pk):
     return render(request, 'main/remove_post.html', {'Post': post})
 ```
 
-***OSS_project/OSS_project/main/urls.py*** 생성후 다음코드를 복사 붙여넣기
-```python
-from django.contrib import admin
-from django.urls import path
-# index는 대문, blog는 게시판
-from main.views import index, blog, posting, new_post, remove_post
+## 3.4 어플리케이션 Template 정의
 
+MVT 패턴중 마지막인 Template의 정의만 남았다.
 
+Template은 기본적으로 html파일로 정의되며 어플리케이션 폴더에 별도의 templates/main 폴더를
+생성하여 만들어준다.
 
-urlpatterns = [
-    path('admin/', admin.site.urls),
-    # 웹사이트의 첫화면은 index 페이지이다 + URL이름은 index이다
-    path('', index, name='index'),
-    # URL:80/blog에 접속하면 blog 페이지 + URL이름은 blog이다
-    path('blog/', blog, name='blog'),
-    # URL:80/blog/숫자로 접속하면 게시글-세부페이지(posting)
-    path('blog/<int:pk>/', posting, name='posting'),
-    # 게시글작성페이지
-    path('blog/new_post/', new_post),
-    # 게시글 삭제 페이지
-    path('blog/<int:pk>/remove/', remove_post),
-]
+***OSS_project/OSS_project/main/templates/main*** 경로로 폴더를 생성해준다.
+
+templates 폴더를 생성후 그안에 main폴더를 생성!
+```
+OSS_project/
+    OSS_project/
+        main/
+            templates/            <= 생성1
+                main/             <= 생성2
 ```
 
+## 3.4.1 게시글 목록 페이지
+전체 게시글의 목록을 표시해주는 페이지이다. 위에서 정의해놓은 Model 덕분에 각 템플릿을
+컴팩트하게 정의할 수 있다. 
 
-***OSS_project/urls.py*** 를 다음코드로 교체
-```python
-from django.contrib import admin
-from django.urls import path, include
+또한 동적인 페이지의 구현을 위해 파이썬을 html 내부에서 사용하게 된다.
 
-urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('', include('main.urls')),
-]
-```
+다음 게시글 목록에서는 list.pk 구문이 각 게시글 상세페이지의 링크를 동적으로 표시해주고,
+list.postname 부분이 각 게시글의 이름을 표시하게 된다.
 
-***OSS_project/OSS_project/main/admin.py*** 를 다음코드로 교체
-```python
-from django.contrib import admin
-# 게시글(Post) Model을 불러옵니다
-from .models import Post
+코드를 보면 for문을 통해 모든 게시글들에 대해 차례로 표시되도록 동작하는것을 알 수 있다.
 
-# Register your models here.
-# 관리자(admin)가 게시글(Post)에 접근 가능
-admin.site.register(Post)
-```
-
-***OSS_project/OSS_project/main/models.py*** 를 다음코드로 교체
-```python
-from django.db import models
-
-class Post(models.Model):
-    objects = models.Manager()
-    postname = models.CharField(max_length=50)
-    contents = models.TextField()
-
-    # postname이 Post object 대신 나오기
-    def __str__(self):
-        return self.postname
-```
-
-***superuser(관리자계정)*** 생성하기
-```
-$ python3 manage.py createsuperuser
-```
-
-```
-PS C:\Users\An\Desktop\Django\OSS_python_django> python manage.py createsuperuser
-C:\Users\An\anaconda3\python.exe: can't open file 'manage.py': [Errno 2] No such file or directory
-PS C:\Users\An\Desktop\Django\OSS_python_django> cd .\OSS_project\
-PS C:\Users\An\Desktop\Django\OSS_python_django\OSS_project> python manage.py createsuperuser
-Username (leave blank to use 'an'): ACH
-Email address: leaping96@ajou.ac.kr
-Password: 
-Password (again):
-This password is too short. It must contain at least 8 characters.
-This password is too common.
-This password is entirely numeric.
-Bypass password validation and create user anyway? [y/N]: y
-Superuser created successfully.
-```
-
-
-## 3.1 글 목록 페이지
-***OSS_project/OSS_project/main/templates/main/blog.html***생성후 다음 코드를 복사
+***OSS_project/OSS_project/main/templates/main/blog.html*** 생성후 다음 코드를 복사
 ```html
 <html>
     <head>
@@ -258,7 +308,11 @@ Superuser created successfully.
 
 
 ## 3.2 글 상세 페이지
-***OSS_project/OSS_project/main/templates/main/posting.html***생성후 다음 코드를 복사
+글 상세 페이지에서는 URL을 통해 받은 게시글 한개에 대하여 글 제목과 내용을 차례로 표시한다.
+
+모델에서 정의해준 postname과 contents를 한 차례만 불러오는것으로 페이지가 완성된다.
+
+***OSS_project/OSS_project/main/templates/main/posting.html*** 생성후 다음 코드를 복사
 ```html
 <html>
     <head>
@@ -276,8 +330,15 @@ Superuser created successfully.
 ```
 
 
-## 3.3 글쓰기 페이지
-***OSS_project/OSS_project/main/templates/main/new_post.html***생성후 다음 코드를 복사
+## 3.3 게시글생성 페이지
+
+글쓰기 페이지도 상세 페이지와 반대로 postname과 contents에 대한 1번의 세이브처리이다.
+
+html의 자세한 문법에 대한 설명은 생략하겠지만 form 태그의 Post 방식을 통해 데이터베이스에
+저장한다고만 알아두자
+
+
+***OSS_project/OSS_project/main/templates/main/new_post.html*** 생성후 다음 코드를 복사
 ```html
 <!DOCTYPE html>
 <html lang="en">
@@ -299,8 +360,16 @@ Superuser created successfully.
 </html>
 ```
 
-## 3.4 글삭제 페이지 
-***OSS_project/OSS_project/main/templates/main/remove_post.html***생성후 다음 코드를 복사
+## 3.4 게시글 삭제 페이지 
+
+마지막 페이지인 게시글 삭제페이지이다. 
+
+게시글 삭제 페이지에서 삭제 버튼을 누를 경우 해당 게시글에 해당하는 정보를 URL로 보내어
+삭제페이지로 이동하게 된다.
+
+삭제페이지에서 해당 게시글의 제목을 표시한 후, 한 번 더 삭제 버튼을 누를경우 데이터베이스에서 삭제하도록 되어있다.
+
+***OSS_project/OSS_project/main/templates/main/remove_post.html*** 생성후 다음 코드를 복사
 ```html
 <!DOCTYPE html>
 <html lang="en">
@@ -317,3 +386,5 @@ Superuser created successfully.
 </body>
 </html>
 ```
+# 4. 전체 시연 영상
+[![프로젝트시연](http://img.youtube.com/vi/rktyUUtjy38/maxresdefault.jpg)](https://youtu.be/rktyUUtjy38?t=0s) 
