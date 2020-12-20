@@ -8,11 +8,15 @@
 pip install django
 ```
 2) 장고 기반 프로젝트 생성
+```bash
 django-admin startproject <프로젝트명>
+```
 
 3) 데이터베이스 생성
+```bash
 cd <프로젝트명>
 python manage.py migrate
- 
-4) 
+```
+4)  
+
 2.	
