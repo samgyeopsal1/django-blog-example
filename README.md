@@ -1,9 +1,8 @@
 OSS_project
 =================
 # 1. 장고 프레임워크의 개념 알기!
-```markdown
-{% include video.html id="04FVxBOX42A&feature=youtu.be" %}  
-```
+[![장고프레임워크](http://img.youtube.com/vi/04FVxBOX42A/0.jpg)](https://youtu.be/04FVxBOX42A?t=0s) 
+
 
 # 2. 장고 프레임워크를 사용해 웹페이지 만들어보기
 ## 2.1 장고 설치하기 
