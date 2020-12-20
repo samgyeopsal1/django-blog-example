@@ -388,3 +388,8 @@ html의 자세한 문법에 대한 설명은 생략하겠지만 form 태그의 P
 ```
 # 4. 전체 시연 영상
 [![프로젝트시연](http://img.youtube.com/vi/_7OAbYvTBO8/maxresdefault.jpg)](https://youtu.be/_7OAbYvTBO8?t=0s) 
+
+## 4.1 부가설명 
+templates에서 작성한 페이지 외에 admin 페이지에 대한 시연을 동영상에 추가해두었다.
+
+admin 페이지에선 별도의 코드작성 없이 장고 프레임워크에서 model 데이터에 대해 crud (생성, 수정, 삭제, 조회)를 테스트해볼 수 있다. 
