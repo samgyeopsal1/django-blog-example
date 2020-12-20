@@ -387,4 +387,4 @@ html의 자세한 문법에 대한 설명은 생략하겠지만 form 태그의 P
 </html>
 ```
 # 4. 전체 시연 영상
-[![프로젝트시연](http://img.youtube.com/vi/rktyUUtjy38/maxresdefault.jpg)](https://youtu.be/rktyUUtjy38?t=0s) 
+[![프로젝트시연](http://img.youtube.com/vi/_7OAbYvTBO8/maxresdefault.jpg)](https://youtu.be/_7OAbYvTBO8?t=0s) 
