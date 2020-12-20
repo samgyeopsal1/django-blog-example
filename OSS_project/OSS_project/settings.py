@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 
 from pathlib import Path
 
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -20,7 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '$cfu0=b3)0olr9yf5r4f1*o^5zy(!gk(*4rhtu*xqfdc-+4byw'
+SECRET_KEY = '*8==p^kyl4die7=h0!!(883id)v89io)9wfaab#!!fz4_f%$r_'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -30,6 +31,8 @@ ALLOWED_HOSTS = []
 
 # Application definition
 
+# 어플리케이션이 사용할 모듈들 정의
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -37,7 +40,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'main',
 ]
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

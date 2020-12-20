@@ -82,13 +82,10 @@ Not Found: /favicon.ico
 ```bash
 $ python manage.py startapp main
 ```
-***OSS_project/OSS_project/settings.py*** 수정
+***OSS_project/OSS_project/settings.py*** 파일의 기존 INSTALLED_APPS 구절을 다음코드로 교체 
 
-INSTALLED_APPS 구절을 다음과 같이 수정해주고 
-
-파일이 저장되는 공간 부분을 복사해서 붙여넣어준후 저장
 ```
-# 어플리케이션이 사용할 모듈들 정의
+# 어플리케이션에 사용할 라이브러리 정의
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -99,9 +96,6 @@ INSTALLED_APPS = [
     'main',
 ]
 
-# 파일이 저장되는 공간 추가하기
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-MEDIA_URL = '/media/'
 ```
 ***OSS_project/OSS_project/main/templates/main*** 경로로 폴더를 생성해준다.
 
@@ -110,8 +104,8 @@ templates 폴더를 생성후 그안에 main폴더를 생성!
 OSS_project/
     OSS_project/
         main/
-            templates/
-                main/
+            templates/            <= 생성1
+                main/             <= 생성2
 ```
 
 ***OSS_project/OSS_project/main/views.py*** 에 다음코드를 복사
@@ -140,18 +134,10 @@ def posting(request, pk):
 
 def new_post(request):
     if request.method == 'POST':
-        if request.POST['mainphoto']:
-            new_article=Post.objects.create(
-                postname=request.POST['postname'],
-                contents=request.POST['contents'],
-                mainphoto=request.POST['mainphoto'],
-            )
-        else:
-            new_article=Post.objects.create(
-                postname=request.POST['postname'],
-                contents=request.POST['contents'],
-                mainphoto=request.POST['mainphoto'],
-            )
+        new_article=Post.objects.create(
+            postname=request.POST['postname'],
+            contents=request.POST['contents'],
+        )
         return redirect('/blog/')
     return render(request, 'main/new_post.html')
 
@@ -163,16 +149,14 @@ def remove_post(request, pk):
     return render(request, 'main/remove_post.html', {'Post': post})
 ```
 
-***OSS_project/OSS_project/main/urls.py*** 에 다음코드를 복사
+***OSS_project/OSS_project/main/urls.py*** 생성후 다음코드를 복사 붙여넣기
 ```python
 from django.contrib import admin
 from django.urls import path
 # index는 대문, blog는 게시판
 from main.views import index, blog, posting, new_post, remove_post
 
-# 이미지를 업로드하자
-from django.conf.urls.static import static
-from django.conf import settings
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -187,13 +171,10 @@ urlpatterns = [
     # 게시글 삭제 페이지
     path('blog/<int:pk>/remove/', remove_post),
 ]
-
-# 이미지 URL 설정
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 ```
 
 
-***OSS_project/urls.py*** 에 다음코드를 복사
+***OSS_project/urls.py*** 를 다음코드로 교체
 ```python
 from django.contrib import admin
 from django.urls import path, include
@@ -204,7 +185,7 @@ urlpatterns = [
 ]
 ```
 
-***OSS_project/OSS_project/main/admin.py*** 에 다음코드를 복사
+***OSS_project/OSS_project/main/admin.py*** 를 다음코드로 교체
 ```python
 from django.contrib import admin
 # 게시글(Post) Model을 불러옵니다
@@ -213,6 +194,20 @@ from .models import Post
 # Register your models here.
 # 관리자(admin)가 게시글(Post)에 접근 가능
 admin.site.register(Post)
+```
+
+***OSS_project/OSS_project/main/models.py*** 를 다음코드로 교체
+```python
+from django.db import models
+
+class Post(models.Model):
+    objects = models.Manager()
+    postname = models.CharField(max_length=50)
+    contents = models.TextField()
+
+    # postname이 Post object 대신 나오기
+    def __str__(self):
+        return self.postname
 ```
 
 ***superuser(관리자계정)*** 생성하기
@@ -236,29 +231,6 @@ Bypass password validation and create user anyway? [y/N]: y
 Superuser created successfully.
 ```
 
-***OSS_project/OSS_project/main/models.py*** 에 다음코드를 복사
-```python
-from django.db import models
-
-class Post(models.Model):
-    objects = models.Manager()
-    postname = models.CharField(max_length=50)
-    # 게시글 Post에 이미지 추가
-    mainphoto = models.ImageField(blank=True, null=True)
-    contents = models.TextField()
-
-    # postname이 Post object 대신 나오기
-    def __str__(self):
-        return self.postname
-```
-
-게시글에 사진을 첨부할 수 있도록 사진을 처리하는 pillow 라이브러리 설치
-```
-$ pip install pillow
-$ python3 manage.py makemigrations
-$ python3 manage.py migrate
-
-```
 
 ## 3.1 글 목록 페이지
 ***OSS_project/OSS_project/main/templates/main/blog.html***생성후 다음 코드를 복사
@@ -296,11 +268,7 @@ $ python3 manage.py migrate
         <h1>게시글 개별 페이지입니다</h1>
         <p>{{post.postname}}</p>
         <p>{{post.contents}}</p>
-        <!-- 이미지 보여주기 -->
-        {% if post.mainphoto %}
-            <img src = "{{ post.mainphoto.url }}" alt="" height="600">
-            <br>
-        {% endif %}
+
         <a href="/blog/{{post.pk}}/remove">삭제</a>
         <a href="/blog/">목록</a>
     </body>
@@ -325,13 +293,11 @@ $ python3 manage.py migrate
         <input type="text" name="postname"><br>
         내용<br>
         <textarea rows="10" cols="50" name="contents"></textarea><br>
-        <input type="file" name="mainphoto"><br>
         <input type="submit" value="글쓰기">
     </form>
 </body>
 </html>
 ```
-
 
 ## 3.4 글삭제 페이지 
 ***OSS_project/OSS_project/main/templates/main/remove_post.html***생성후 다음 코드를 복사
