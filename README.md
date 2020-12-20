@@ -2,7 +2,8 @@ OSS_project
 =================
 # 1. 장고 프레임워크의 개념 알기!
 
-<iframe width="640" height="360" src="https://youtu.be/04FVxBOX42A" frameborder="0" gesture="media" allowfullscreen=""></iframe>
+<iframe width="640" height="360" src="https://www.youtube.com/embed/kTcRRaXV-fg?ecver=1"  
+ frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>  
 
 # 2. 장고 프레임워크를 사용해 웹페이지 만들어보기
 ## 2.1 장고 설치하기 
