@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.urls import path
 # index는 대문, blog는 게시판
-from main.views import index, blog, posting, new_post, remove_post
+from main.views import index, blog, posting, new_post, remove_post, catalog_view
 
 
 
@@ -17,4 +17,5 @@ urlpatterns = [
     path('blog/new_post/', new_post),
     # 게시글 삭제 페이지
     path('blog/<int:pk>/remove/', remove_post),
+    path('catalog/', catalog_view),
 ]

@@ -35,3 +35,6 @@ def remove_post(request, pk):
         post.delete()
         return redirect('/blog/')
     return render(request, 'main/remove_post.html', {'Post': post})
+
+def catalog_view(request):
+    return render(request, 'catalog.html')
